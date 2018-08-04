@@ -12,19 +12,15 @@ var colors   = require( 'colors' );
 require( 'date-utils' );
 var schedule = require( 'node-schedule' );
 
-const DataCmnt   = require( './js/DataCmnt' );
-const DataPerson = require( './js/DataPerson' );
-const DataRoom   = require( './js/DataRoom' );
-const DataSensors = require( './js/DataSensors' );
-const Docomo     = require( './js/Docomo' );
-const PlayMusic  = require( './js/PlayMusic' );
+const DataPersons = require( './js/DataPersons' );
+const DataRoom    = require( './js/DataRoom' );
 
 
 // Ver. 表示
 var now = new Date();
 console.log( "[main.js] " + now.toFormat("YYYY年MM月DD日 HH24時MI分SS秒").rainbow );
 console.log( "[main.js] " + "ver.01 : app.js".rainbow );
-console.log( "[main.js] " + "access to http://localhost:6000" );
+console.log( "[main.js] " + "access to http://localhost:4001" );
 
 // サーバー・オブジェクトを生成
 var server = http.createServer();
@@ -81,39 +77,6 @@ function doRequest(
       }
     );
   break;
-  case '/bg.gif':
-    fs.readFile( './app/bg.gif', 'binary',
-      function( err, data ){
-        res.writeHead( 200, {'Content-Type': 'image/gif',
-                             'Access-Control-Allow-Origin': '*'
-                      } );
-        res.write( data, 'binary' );
-        res.end();
-      }
-    );
-  break;
-  case '/jQueryRotate.js':
-    fs.readFile( './app/js_lib/jQueryRotate.js', 'UTF-8',
-      function( err, data ){
-        res.writeHead( 200, {'Content-Type': 'application/javascript',
-                             'Access-Control-Allow-Origin': '*'
-                      } );
-        res.write( data );
-        res.end();
-      }
-    );
-  break;
-  case '/tmp/picture.jpg':
-    fs.readFile( './tmp/picture.jpg', 'binary',
-      function( err, data ){
-        res.writeHead( 200, {'Content-Type': 'image/jpg',
-                             'Access-Control-Allow-Origin': '*'
-                      } );
-        res.write( data, 'binary' );
-        res.end();
-      }
-    );
-  break;
   }
 }
 
@@ -126,9 +89,8 @@ var io = socketio.listen( server );
 //-----------------------------------------------------------------------------
 var timerFlg;
 
-var person  = new DataPerson();
+var person  = new DataPersons();
 var room    = new DataRoom();
-var docomo  = new Docomo();
 
 
 startSystem();
@@ -171,10 +133,11 @@ io.sockets.on( 'connection', function( socket ){
 
   socket.on( 'C_to_S_GET_VISITOR', function(){
     console.log( "[main.js] " + 'C_to_S_GET_VISITOR' );
-
+/*
     var obj = person.GetRanking( '/media/pi/USBDATA/person.txt' );
 //    console.log( "[main.js] obj = " + JSON.stringify(obj) );
     io.sockets.emit( 'S_to_C_VISITOR', JSON.stringify(obj) );
+*/
   });
 
 
@@ -182,6 +145,7 @@ io.sockets.on( 'connection', function( socket ){
     console.log( "[main.js] " + 'C_to_S_GET_VISITOR_ONE_DAY' );
     console.log( "[main.js] data.date   = " + data.date );
 
+/*
     var file = '/media/pi/USBDATA/' + data.date + '_room.txt';
 
     var ret = false;
@@ -193,6 +157,7 @@ io.sockets.on( 'connection', function( socket ){
     } else {
       io.sockets.emit( 'S_to_C_VISITOR_ONE_DAY', {ret:true, value:JSON.stringify(obj)} );
     }
+*/
   });
 
 

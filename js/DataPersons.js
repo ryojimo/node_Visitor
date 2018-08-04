@@ -16,9 +16,9 @@ var MongoClient  = require( 'mongodb' ).MongoClient;
  * @param {void}
  * @constructor
  * @example
- * var obj = new DataPerson();
+ * var obj = new DataPersons();
 */
-var DataPerson = function(){
+var DataPersons = function(){
   /**
    * MongoDB のデータベース名
    * @type {string}
@@ -48,10 +48,10 @@ var DataPerson = function(){
  * @example
  * GetMDDocData( '0000114347' );
 */
-DataPerson.prototype.GetMDDocData = function( gid, name, callback ){
-  console.log( "[DataPerson.js] GetMDDocData()" );
-  console.log( "[DataPerson.js] gid  = " + gid );
-  console.log( "[DataPerson.js] name = " + name );
+DataPersons.prototype.GetMDDocData = function( gid, name, callback ){
+  console.log( "[DataPersons.js] GetMDDocData()" );
+  console.log( "[DataPersons.js] gid  = " + gid );
+  console.log( "[DataPersons.js] name = " + name );
 
   var data = { id: gid, name: name, cnt: 0, lastVisitDay: '' };
 
@@ -76,7 +76,7 @@ DataPerson.prototype.GetMDDocData = function( gid, name, callback ){
         callback( true, documents );
       }
       catch( e ){
-        console.log( "[DataPerson.js] e = " + e );
+        console.log( "[DataPersons.js] e = " + e );
         callback( false, data );
       }
     });
@@ -91,8 +91,8 @@ DataPerson.prototype.GetMDDocData = function( gid, name, callback ){
  * @example
  * Update( obj );
 */
-DataPerson.prototype.Update = function( data ){
-  console.log( "[DataPerson.js] Update()" );
+DataPersons.prototype.Update = function( data ){
+  console.log( "[DataPersons.js] Update()" );
 
   this.data.gid          = data.gid;
   this.data.name         = data.name;
@@ -108,9 +108,9 @@ DataPerson.prototype.Update = function( data ){
  * @example
  * UpdateFile( '/media/pi/USBDATA/person.txt' );
 */
-DataPerson.prototype.UpdateFile = function( file ){
-  console.log( "[DataPerson.js] UpdateFile()" );
-  console.log( "[DataPerson.js] file = " + file );
+DataPersons.prototype.UpdateFile = function( file ){
+  console.log( "[DataPersons.js] UpdateFile()" );
+  console.log( "[DataPersons.js] file = " + file );
 
   var obj = new Array();
   var cnt = -1;
@@ -143,7 +143,7 @@ DataPerson.prototype.UpdateFile = function( file ){
     ret = fs.writeFileSync( file, wdata, 'utf8' );
   } catch( err ){
     if( err.code === 'ENOENT' ){
-      console.log( "[DataPerson.js] file does not exist." );
+      console.log( "[DataPersons.js] file does not exist." );
     }
   }
 }
@@ -157,10 +157,10 @@ DataPerson.prototype.UpdateFile = function( file ){
  * @example
  * GetData( '/media/pi/USBDATA/person.txt', '0000******' );
 */
-DataPerson.prototype.GetData = function( file, gid ){
-  console.log( "[DataPerson.js] GetData()" );
-  console.log( "[DataPerson.js] file = " + file );
-  console.log( "[DataPerson.js] gid = " + gid );
+DataPersons.prototype.GetData = function( file, gid ){
+  console.log( "[DataPersons.js] GetData()" );
+  console.log( "[DataPersons.js] file = " + file );
+  console.log( "[DataPersons.js] gid = " + gid );
 
   var obj = new Array();
   var cnt = -1;
@@ -199,9 +199,9 @@ DataPerson.prototype.GetData = function( file, gid ){
  * @example
  * GetRanking( '/media/pi/USBDATA/person.txt' );
 */
-DataPerson.prototype.GetRanking = function( file ){
-  console.log( "[DataPerson.js] GetRanking()" );
-  console.log( "[DataPerson.js] file = " + file );
+DataPersons.prototype.GetRanking = function( file ){
+  console.log( "[DataPersons.js] GetRanking()" );
+  console.log( "[DataPersons.js] file = " + file );
 
   var obj = new Array();
   var cnt = -1;
@@ -225,12 +225,12 @@ DataPerson.prototype.GetRanking = function( file ){
   var rank = new Array();
   var i = 0;
   for( i=0; i < 20; i++ ){
-//    console.log( "[DataPerson.js] name = " + obj[i].name );
-//    console.log( "[DataPerson.js] cnt  = " + obj[i].cnt  );
+//    console.log( "[DataPersons.js] name = " + obj[i].name );
+//    console.log( "[DataPersons.js] cnt  = " + obj[i].cnt  );
     rank.push( {name:obj[i].name, cnt:obj[i].cnt} );
   }
 
-//  console.log( "[DataPerson.js] obj = " + JSON.stringify(rank) );
+//  console.log( "[DataPersons.js] obj = " + JSON.stringify(rank) );
   return rank;
 }
 
@@ -242,9 +242,9 @@ DataPerson.prototype.GetRanking = function( file ){
  * @example
  * var obj = ReadFile( "/media/pi/USBDATA/data.txt" );
 */
-DataPerson.prototype.ReadFile = function( file ){
-  console.log( "[DataPerson.js] ReadFile()" );
-  console.log( "[DataPerson.js] file = " + file );
+DataPersons.prototype.ReadFile = function( file ){
+  console.log( "[DataPersons.js] ReadFile()" );
+  console.log( "[DataPersons.js] file = " + file );
 
   var ret = false;
   try{
@@ -252,7 +252,7 @@ DataPerson.prototype.ReadFile = function( file ){
     ret = fs.readFileSync( file, 'utf8' );
   } catch( err ){
     if( err.code === 'ENOENT' ){
-      console.log( "[DataPerson.js] file does not exist." );
+      console.log( "[DataPersons.js] file does not exist." );
       ret = false;
     }
   }
@@ -267,9 +267,9 @@ DataPerson.prototype.ReadFile = function( file ){
  * @example
  * var obj = MakeJson( str );
 */
-DataPerson.prototype.MakeJson = function( string ){
-  console.log( "[DataPerson.js] MakeJson()" );
-//  console.log( "[DataPerson.js] file = " + string );
+DataPersons.prototype.MakeJson = function( string ){
+  console.log( "[DataPersons.js] MakeJson()" );
+//  console.log( "[DataPersons.js] file = " + string );
 
   var obj = new Array();
   var ret;
@@ -281,6 +281,6 @@ DataPerson.prototype.MakeJson = function( string ){
 }
 
 
-module.exports = DataPerson;
+module.exports = DataPersons;
 
 

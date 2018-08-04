@@ -3,10 +3,9 @@
  * @author       Ryoji Morita
  * @version      0.0.1
 */
-var sv_ip   = 'reception.rp.lfx.sony.co.jp';  // node.js server の IP アドレス
-//var sv_ip   = 'sensor.rp.lfx.sony.co.jp';   // node.js server の IP アドレス
-//var sv_ip   = '43.31.78.45';                // node.js server の IP アドレス
-//var sv_ip   = '192.168.91.11';              // node.js server の IP アドレス
+//var sv_ip   = 'reception.rp.lfx.sony.co.jp';  // node.js server の IP アドレス
+//var sv_ip   = '43.2.100.151';               // node.js server の IP アドレス
+var sv_ip   = '192.168.91.11';              // node.js server の IP アドレス
 var sv_port = 4001;                           // node.js server の port 番号
 
 var server = io.connect( 'http://' + sv_ip + ':' + sv_port ); //ローカル
@@ -138,21 +137,6 @@ server.on( 'S_to_C_DATA', function( data ){
   console.log( "[app.js] " + 'S_to_C_DATA' );
   console.log( "[app.js] data = " + data.value );
 //  window.alert( 'コマンドを送信しました。\n\r' + data.value );
-
-  document.getElementById('val_sensor').innerHTML = data.value; // 数値を表示
-});
-
-
-server.on( 'S_to_C_DATA_LAST30S', function( data ){
-  console.log( "[app.js] " + 'S_to_C_DATA_LAST30S' );
-  console.log( "[app.js] data.diff  = " + data.diff );
-  console.log( "[app.js] data.value = " + data.value );
-});
-
-
-server.on( 'S_to_C_SENSOR_ONE_DAY', function( data ){
-  console.log( "[app.js] " + 'S_to_C_SENSOR_ONE_DAY' );
-//  console.log( "[app.js] data = " + data );
 });
 
 
