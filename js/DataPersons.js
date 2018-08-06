@@ -23,7 +23,7 @@ var DataPersons = function(){
    * MongoDB のデータベース名
    * @type {string}
   */
-  this.nameDatabase = '24f_bt';
+  this.nameDatabase = 'persons';
 
   /**
    * MongoDB の URL
@@ -40,6 +40,75 @@ var DataPersons = function(){
 
 
 /**
+ * Mongodb にデータベース、コレクション、ドキュメントを作成する。
+ * @param {Object.<string, string>} data - JSON 文字列
+ * @return {void}
+ * @example
+ * CreateMDDoc( "{...}" );
+*/
+DataPersons.prototype.CreateMDDoc = function( data ){
+  console.log( "[DataPersons.js] CreateMDDoc()" );
+  console.log( "[DataPersons.js] data = " + JSON.stringify(data) );
+
+  MongoClient.connect( this.mongo_url, function(err, db) {
+    if( err ){
+      throw err;
+    }
+
+    // データベースを取得する
+    var dbo = db.db( 'persons' );
+
+    // コレクションを取得する
+    var clo = dbo.collection( 'visitor' );
+
+    // doc をデータベースに insert する
+    clo.insertOne( data, function(err, res) {
+      if( err ){
+        throw err;
+      }
+      db.close();
+    });
+  });
+}
+
+
+/**
+ * Mongodb にデータベース、コレクション、ドキュメントを更新する。
+ * @param {Object.<string, string>} data - JSON 文字列
+ * @return {void}
+ * @example
+ * CreateMDDoc( "{...}" );
+*/
+DataPersons.prototype.UpdateMDDoc = function( data ){
+  console.log( "[DataPersons.js] UpdateMDDoc()" );
+  console.log( "[DataPersons.js] data = " + JSON.stringify(data) );
+
+  MongoClient.connect( this.mongo_url, function(err, db) {
+    if( err ){
+      throw err;
+    }
+
+    // データベースを取得する
+    var dbo = db.db( 'persons' );
+
+    // コレクションを取得する
+    var clo = dbo.collection( 'visitor' );
+
+    var query = { gid: data.gid };
+    var newvalues = { $set: {cnt: data.cnt, lastVisitDay: data.lastVisitDay } };
+
+    // doc をデータベースに insert する
+    clo.updateOne( query, newvalues, function(err, res) {
+      if( err ){
+        throw err;
+      }
+      db.close();
+    });
+  });
+}
+
+
+/**
  * コレクションに含まれる全ドキュメントを取得する
  * @param {string} gid   - MongoDB のコレクション。
  * @param {string} name  - 対象の名前。
@@ -48,12 +117,11 @@ var DataPersons = function(){
  * @example
  * GetMDDocData( '0000114347' );
 */
-DataPersons.prototype.GetMDDocData = function( gid, name, callback ){
+DataPersons.prototype.GetMDDocData = function( data, callback ){
   console.log( "[DataPersons.js] GetMDDocData()" );
-  console.log( "[DataPersons.js] gid  = " + gid );
-  console.log( "[DataPersons.js] name = " + name );
+  console.log( "[DataPersons.js] data = " + JSON.stringify(data) );
 
-  var data = { id: gid, name: name, cnt: 0, lastVisitDay: '' };
+//  var data = { gid: data.gid, name: data.name, cnt: 0, lastVisitDay: '' };
 
   MongoClient.connect( this.mongo_url, function(err, db) {
     if( err ){
@@ -61,134 +129,29 @@ DataPersons.prototype.GetMDDocData = function( gid, name, callback ){
     }
 
     // データベースを取得する
-    var dbo = db.db( '24f_bt' );
+    var dbo = db.db( 'persons' );
 
     // コレクションを取得する
-    var clo = dbo.collection( 'persons' );
+    var clo = dbo.collection( 'visitor' );
 
-    // コレクションに含まれる全ドキュメントを取得する
-    clo.find({}).toArray( function(err, documents){
+    var query = { gid: data.gid };
+
+    // {gid: gid} のドキュメントを取得する
+    clo.find( query ).toArray( function(err, documents){
       try{
-        if (err) throw err;
-        db.close();
-
-//      console.log( data );
-        callback( true, documents );
+        if (err){
+          throw err;
+        } else {
+          db.close();
+          callback( true, documents );
+        }
       }
       catch( e ){
         console.log( "[DataPersons.js] e = " + e );
-        callback( false, data );
+        callback( false, documents );
       }
     });
   });
-}
-
-
-/**
- * データを更新する
- * @param {Object} data - 更新するデータ
- * @return {void}
- * @example
- * Update( obj );
-*/
-DataPersons.prototype.Update = function( data ){
-  console.log( "[DataPersons.js] Update()" );
-
-  this.data.gid          = data.gid;
-  this.data.name         = data.name;
-  this.data.cnt++;
-  this.data.lastVisitDay = data.lastVisitDay;
-}
-
-
-/**
- * 引数の file の中身を更新する
- * @param {string} file - 対象のファイル ( フルパス )
- * @return {void}
- * @example
- * UpdateFile( '/media/pi/USBDATA/person.txt' );
-*/
-DataPersons.prototype.UpdateFile = function( file ){
-  console.log( "[DataPersons.js] UpdateFile()" );
-  console.log( "[DataPersons.js] file = " + file );
-
-  var obj = new Array();
-  var cnt = -1;
-
-  var ret = this.ReadFile( file );
-  if( ret !== false ){
-    // JSON 配列の形式に整形
-    obj = this.MakeJson( ret );
-
-    for( cnt = 0; cnt < obj.length; cnt++ ){
-      if( obj[cnt].gid === this.data.gid ){
-          obj[cnt].cnt++;
-          obj[cnt].lastVisitDay = this.data.lastVisitDay;
-          break;
-      }
-    }
-  }
-
-  if( cnt === -1 || cnt === obj.length ){
-    obj.push( this.data );
-  }
-
-  // ファイルに書き込む
-  var wdata = JSON.stringify( obj );
-  wdata = wdata.substr( 1, wdata.length - 2 ) + ',';
-  wdata = wdata.replace( /},/g, '},\n' );
-
-  var ret = false;
-  try{
-    ret = fs.writeFileSync( file, wdata, 'utf8' );
-  } catch( err ){
-    if( err.code === 'ENOENT' ){
-      console.log( "[DataPersons.js] file does not exist." );
-    }
-  }
-}
-
-
-/**
- * 引数の file から gid のデータを取得する
- * @param {string} file - 対象のファイル ( フルパス )
- * @param {number} gid - Global ID
- * @return {Object} data - 読み出したデータ
- * @example
- * GetData( '/media/pi/USBDATA/person.txt', '0000******' );
-*/
-DataPersons.prototype.GetData = function( file, gid ){
-  console.log( "[DataPersons.js] GetData()" );
-  console.log( "[DataPersons.js] file = " + file );
-  console.log( "[DataPersons.js] gid = " + gid );
-
-  var obj = new Array();
-  var cnt = -1;
-  var data = { gid:'', name:'', cnt:1, lastVisitDay:'' };
-
-  var ret = this.ReadFile( file );
-  if( ret !== false ){
-    // JSON 配列の形式に整形
-    obj = this.MakeJson( ret );
-
-    for( cnt = 0; cnt < obj.length; cnt++ ){
-      if( obj[cnt].gid === gid ){
-          data.gid = obj[cnt].gid;
-          data.name = obj[cnt].name;
-          data.cnt = obj[cnt].cnt;
-          data.lastVisitDay = obj[cnt].lastVisitDay;
-          break;
-      }
-    }
-  }
-
-  if( cnt === -1 || cnt === obj.length ){
-    data.gid = gid;
-    data.name = 'Guest';
-    data.cnt = 0;
-    data.lastVisitDay = '';
-  }
-  return data;
 }
 
 
