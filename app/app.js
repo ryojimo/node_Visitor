@@ -109,7 +109,7 @@ function makeChartVisitorRanking( domid, obj ){
                }
     ],
     axisX: { labelAngle:-90, labelFontSize:10, labelFontColor:'#222' },
-    axisY: { minimum: 450, labelFontSize:14, labelFontColor:'#222' },
+    axisY: { minimum: 0, labelFontSize:14, labelFontColor:'#222' },
     data: [{type: obj.type,           // グラフの種類 (area, bar, bubble, column, stackedColumn )
             color: obj.color,
             cursor: 'pointer',
