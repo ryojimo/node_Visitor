@@ -3,9 +3,9 @@
  * @author       Ryoji Morita
  * @version      0.0.1
 */
-//var sv_ip   = 'reception.rp.lfx.sony.co.jp';  // node.js server の IP アドレス
+var sv_ip   = 'reception.rp.lfx.sony.co.jp';  // node.js server の IP アドレス
 //var sv_ip   = '43.2.100.151';               // node.js server の IP アドレス
-var sv_ip   = '192.168.91.11';              // node.js server の IP アドレス
+//var sv_ip   = '192.168.91.11';              // node.js server の IP アドレス
 var sv_port = 4001;                           // node.js server の port 番号
 
 var server = io.connect( 'http://' + sv_ip + ':' + sv_port ); //ローカル
@@ -142,26 +142,24 @@ server.on( 'S_to_C_DATA', function( data ){
 
 server.on( 'S_to_C_VISITOR_ONE_DAY', function( data ){
   console.log( "[app.js] " + 'S_to_C_VISITOR_ONE_DAY' );
-//  console.log( "[app.js] data = " + data );
+//  console.log( "[app.js] data = " + JSON.stringify(data) );
 
   if( data.ret == false ){
     alert( 'データがありません。\n\r' );
   }
 
-  var obj = (new Function('return ' + data.value))();
-  updateChartDaily( obj_visitor_daily, obj );
+  updateChartDaily( obj_visitor_daily, data );
 });
 
 
 server.on( 'S_to_C_VISITOR', function( data ){
   console.log( "[app.js] " + 'S_to_C_VISITOR' );
-//  console.log( "[app.js] data = " + data );
+  console.log( "[app.js] data = " + JSON.stringify(data) );
 
   if( data.ret == false ){
     alert( 'データがありません。\n\r' );
   }
 
-//  var obj = (new Function('return ' + data.value))();
   updateChartVisitorRanking( '訪問数ランキング', data );
 });
 
@@ -205,13 +203,12 @@ function updateChartVisitorRanking( title, data ){
   console.log( "[app.js] updateChartVisitorRanking()" );
   console.log( "[app.js] title = " + title );
 
-  console.log( "[app.js] data = " + data );
-  var obj = (new Function('return ' + data))();
+  console.log( "[app.js] data = " + JSON.stringify(data) );
 
   obj_visitor_ranking.data.length = 0;
   var i = 0;
-  for( i = 0; i < obj.length; i++ ){
-    obj_visitor_ranking.data.push( {label:obj[i].name, y:obj[i].cnt} );
+  for( i = 0; i < data.length; i++ ){
+    obj_visitor_ranking.data.push( {label:data[i].name, y:data[i].cnt} );
   }
 
   obj_visitor_ranking.chart.options.title.text = title;

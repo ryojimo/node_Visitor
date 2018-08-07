@@ -89,7 +89,7 @@ var io = socketio.listen( server );
 //-----------------------------------------------------------------------------
 var timerFlg;
 
-var person  = new DataPersons();
+var persons = new DataPersons();
 var room    = new DataRoom();
 
 
@@ -133,11 +133,13 @@ io.sockets.on( 'connection', function( socket ){
 
   socket.on( 'C_to_S_GET_VISITOR', function(){
     console.log( "[main.js] " + 'C_to_S_GET_VISITOR' );
-/*
-    var obj = person.GetRanking( '/media/pi/USBDATA/person.txt' );
-//    console.log( "[main.js] obj = " + JSON.stringify(obj) );
-    io.sockets.emit( 'S_to_C_VISITOR', JSON.stringify(obj) );
-*/
+
+    var obj = persons.GetRankingTop50( function( err, doc ){
+      console.log( "[main.js] err     = " + err );
+
+      console.log( "[main.js] doc     = " + JSON.stringify(doc) );
+      io.sockets.emit( 'S_to_C_VISITOR', doc );
+    });
   });
 
 
@@ -146,17 +148,9 @@ io.sockets.on( 'connection', function( socket ){
     console.log( "[main.js] data.date   = " + data.date );
 
 /*
-    var file = '/media/pi/USBDATA/' + data.date + '_room.txt';
-
-    var ret = false;
-    ret = room.UpdateDataOneDay( file );
-    obj = room.dataOneDay;
-
-    if( ret == false ){
-      io.sockets.emit( 'S_to_C_VISITOR_ONE_DAY', {ret:false, value:JSON.stringify(obj)} );
-    } else {
-      io.sockets.emit( 'S_to_C_VISITOR_ONE_DAY', {ret:true, value:JSON.stringify(obj)} );
-    }
+    var obj = persons.GetMDDocDataOneDay( data.date, function( err, data ){
+      io.sockets.emit( 'S_to_C_VISITOR_ONE_DAY', {ret:err, value:data} );
+    });
 */
   });
 
