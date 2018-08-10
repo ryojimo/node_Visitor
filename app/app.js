@@ -43,7 +43,7 @@ window.onunload = function(){
  * @param {object} obj - グラフ化する対象のオブジェクト
  * @return {string} chart - 作成するグラフのオブジェクトとデータ
  * @example
- * makeChartDaily( 'cid_sensors_daily', obj_sensors_daily );
+ * makeChartDaily( 'cid_visitor_daily', obj_visitor_daily );
 */
 function makeChartDaily( domid, obj ){
   console.log( "[app.js] makeChartDaily()" );
@@ -88,7 +88,7 @@ function makeChartDaily( domid, obj ){
  * @param {object} obj - グラフ化する対象のオブジェクト
  * @return {string} chart - 作成するグラフのオブジェクトとデータ
  * @example
- * makeChartVisitorRanking( 'cid_sensors_daily', obj_sensors_daily );
+ * makeChartVisitorRanking( 'cid_visitor_daily', obj_visitor_daily );
 */
 function makeChartVisitorRanking( domid, obj ){
   console.log( "[app.js] makeChartVisitorRanking()" );
@@ -142,13 +142,13 @@ server.on( 'S_to_C_DATA', function( data ){
 
 server.on( 'S_to_C_VISITOR_ONE_DAY', function( data ){
   console.log( "[app.js] " + 'S_to_C_VISITOR_ONE_DAY' );
-//  console.log( "[app.js] data = " + JSON.stringify(data) );
+  console.log( "[app.js] data.value = " + JSON.stringify(data.value) );
 
   if( data.ret == false ){
     alert( 'データがありません。\n\r' );
   }
 
-  updateChartDaily( obj_visitor_daily, data );
+  updateChartDaily( obj_visitor_daily, data.value );
 });
 
 
@@ -186,7 +186,7 @@ function updateChartDaily( obj_chart, data ){
   }
 
   obj_chart.chart.options.title.text = obj_chart.title;
-  obj_chart.chart.options.data.dataPoints = obj_sensors_daily.data;
+  obj_chart.chart.options.data.dataPoints = obj_visitor_daily.data;
   obj_chart.chart.render();
 }
 

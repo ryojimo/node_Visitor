@@ -147,11 +147,10 @@ io.sockets.on( 'connection', function( socket ){
     console.log( "[main.js] " + 'C_to_S_GET_VISITOR_ONE_DAY' );
     console.log( "[main.js] data.date   = " + data.date );
 
-/*
-    var obj = persons.GetMDDocDataOneDay( data.date, function( err, data ){
+    var obj = room.GetMDDocDataOneDay( data.date, function( err, data ){
+//      console.log( "[main.js] data     = " + JSON.stringify(data) );
       io.sockets.emit( 'S_to_C_VISITOR_ONE_DAY', {ret:err, value:data} );
     });
-*/
   });
 
 
