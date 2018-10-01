@@ -11,6 +11,7 @@ var fs       = require( 'fs' );
 var colors   = require( 'colors' );
 require( 'date-utils' );
 var schedule = require( 'node-schedule' );
+var express  = require( 'express' );
 
 const DataPersons = require( './js/DataPersons' );
 const DataRoom    = require( './js/DataRoom' );
@@ -20,7 +21,13 @@ const DataRoom    = require( './js/DataRoom' );
 var now = new Date();
 console.log( "[main.js] " + now.toFormat("YYYY年MM月DD日 HH24時MI分SS秒").rainbow );
 console.log( "[main.js] " + "ver.01 : app.js".rainbow );
-console.log( "[main.js] " + "access to http://localhost:4001" );
+console.log( "[main.js] " + "access to http://localhost:2000" );
+
+// Express オブジェクトを生成
+var ex_app = express();
+var ex_server = ex_app.listen( 2001, function(){
+    console.log( "[main.js] " + "Node.js is listening to PORT:" + ex_server.address().port );
+});
 
 // サーバー・オブジェクトを生成
 var server = http.createServer();
@@ -29,7 +36,7 @@ var server = http.createServer();
 server.on( 'request', doRequest );
 
 // 待ち受けスタート
-server.listen( process.env.VMC_APP_PORT || 4001 );
+server.listen( process.env.VMC_APP_PORT || 2000 );
 console.log( "[main.js] Server running!" );
 
 // request イベント処理
@@ -106,6 +113,46 @@ startSystem();
 function startSystem() {
   console.log( "[main.js] startSystem()" );
 };
+
+
+//-----------------------------------------------------------------------------
+// クライアントからコネクションが来た時の処理関数 ( Express )
+//-----------------------------------------------------------------------------
+ex_app.get("/api/ranking", function(req, res, next){
+  console.log( "[main.js] ex_app.get( \"/api/ranking\" )" );
+
+  var obj = persons.GetRankingTop50( function( err, doc ){
+    console.log( "[main.js] err     = " + err );
+    console.log( "[main.js] doc     = " + JSON.stringify(doc) );
+    res.json( doc );
+  });
+});
+
+
+ex_app.get("/api/gid/:gid", function(req, res, next){
+  console.log( "[main.js] ex_app.get( \"/api/gid/:gid\" )" );
+
+  var target = { 'gid': req.params.gid };
+
+  var obj = persons.GetMDDocData( target, function( err, doc ){
+    console.log( "[main.js] err     = " + err );
+    console.log( "[main.js] doc     = " + JSON.stringify(doc) );
+    res.json( doc );
+  });
+});
+
+
+ex_app.get("/api/date/:date", function(req, res, next){
+  console.log( "[main.js] ex_app.get( \"/api/date/:date\" )" );
+
+  var target = req.params.date;
+
+  var obj = room.GetMDDocDataOneDay( target, function( err, doc ){
+    console.log( "[main.js] err     = " + err );
+    console.log( "[main.js] doc     = " + JSON.stringify(doc) );
+    res.json( doc );
+  });
+});
 
 
 //-----------------------------------------------------------------------------

@@ -6,7 +6,7 @@
 var sv_ip   = 'reception.rp.lfx.sony.co.jp';  // node.js server の IP アドレス
 //var sv_ip   = '43.2.100.151';               // node.js server の IP アドレス
 //var sv_ip   = '192.168.91.11';              // node.js server の IP アドレス
-var sv_port = 4001;                           // node.js server の port 番号
+var sv_port = 2000;                           // node.js server の port 番号
 
 var server = io.connect( 'http://' + sv_ip + ':' + sv_port ); //ローカル
 
@@ -234,8 +234,8 @@ function sendGetCmdVisitorOneDay(){
   var date   = $('#val_date_visitor').val();
   console.log( "[app.js] date   = " + date );
 
-  if( date < '2018-01-24' ){
-    alert( "2018/01/24 以降を指定してください。" );
+  if( date < '2018-08-20' ){
+    alert( "2018/08/20 以降を指定してください。" );
   }
 
   var obj = { date:date };
