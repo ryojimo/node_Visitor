@@ -121,7 +121,7 @@ function startSystem() {
 ex_app.get("/api/ranking", function(req, res, next){
   console.log( "[main.js] ex_app.get( \"/api/ranking\" )" );
 
-  var obj = persons.GetRankingTop50( function( err, doc ){
+  var obj = persons.getRankingTop50( function( err, doc ){
     console.log( "[main.js] err     = " + err );
     console.log( "[main.js] doc     = " + JSON.stringify(doc) );
     res.json( doc );
@@ -134,7 +134,7 @@ ex_app.get("/api/gid/:gid", function(req, res, next){
 
   var target = { 'gid': req.params.gid };
 
-  var obj = persons.GetMDDocData( target, function( err, doc ){
+  var obj = persons.query( target, function( err, doc ){
     console.log( "[main.js] err     = " + err );
     console.log( "[main.js] doc     = " + JSON.stringify(doc) );
     res.json( doc );
@@ -147,7 +147,7 @@ ex_app.get("/api/date/:date", function(req, res, next){
 
   var target = req.params.date;
 
-  var obj = room.GetMDDocDataOneDay( target, function( err, doc ){
+  var obj = room.getOneDay( target, function( err, doc ){
     console.log( "[main.js] err     = " + err );
     console.log( "[main.js] doc     = " + JSON.stringify(doc) );
     res.json( doc );
@@ -181,7 +181,7 @@ io.sockets.on( 'connection', function( socket ){
   socket.on( 'C_to_S_GET_VISITOR', function(){
     console.log( "[main.js] " + 'C_to_S_GET_VISITOR' );
 
-    var obj = persons.GetRankingTop50( function( err, doc ){
+    var obj = persons.getRankingTop50( function( err, doc ){
       console.log( "[main.js] err     = " + err );
 
       console.log( "[main.js] doc     = " + JSON.stringify(doc) );
@@ -194,7 +194,7 @@ io.sockets.on( 'connection', function( socket ){
     console.log( "[main.js] " + 'C_to_S_GET_VISITOR_ONE_DAY' );
     console.log( "[main.js] data.date   = " + data.date );
 
-    var obj = room.GetMDDocDataOneDay( data.date, function( err, data ){
+    var obj = room.getOneDay( data.date, function( err, data ){
 //      console.log( "[main.js] data     = " + JSON.stringify(data) );
       io.sockets.emit( 'S_to_C_VISITOR_ONE_DAY', {ret:err, value:data} );
     });
