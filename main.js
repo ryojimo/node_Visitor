@@ -5,99 +5,93 @@
 */
 
 // 必要なライブラリをロード
-var http     = require( 'http' );
-var socketio = require( 'socket.io' );
-var fs       = require( 'fs' );
-var colors   = require( 'colors' );
-require( 'date-utils' );
-var schedule = require( 'node-schedule' );
-var express  = require( 'express' );
+let http     = require('http');
+let socketio = require('socket.io');
+let fs       = require('fs');
+let colors   = require('colors');
+require('date-utils');
+let schedule = require('node-schedule');
+let express  = require('express');
 
-const DataPersons = require( './js/DataPersons' );
-const DataRoom    = require( './js/DataRoom' );
+const DataPersons = require('./js/DataPersons');
+const DataRoom    = require('./js/DataRoom');
 
 
 // Ver. 表示
-var now = new Date();
-console.log( "[main.js] " + now.toFormat("YYYY年MM月DD日 HH24時MI分SS秒").rainbow );
-console.log( "[main.js] " + "ver.01 : app.js".rainbow );
-console.log( "[main.js] " + "access to http://localhost:2000" );
+let now = new Date();
+console.log("[main.js] " + now.toFormat("YYYY年MM月DD日 HH24時MI分SS秒").rainbow);
+console.log("[main.js] " + "ver.01 : app.js".rainbow);
+console.log("[main.js] " + "access to http://localhost:2000");
 
 // Express オブジェクトを生成
-var ex_app = express();
-var ex_server = ex_app.listen( 2001, function(){
-    console.log( "[main.js] " + "Node.js is listening to PORT:" + ex_server.address().port );
+let ex_app = express();
+let ex_server = ex_app.listen(2001, function() {
+    console.log("[main.js] " + "Node.js is listening to PORT:" + ex_server.address().port);
 });
 
 // サーバー・オブジェクトを生成
-var server = http.createServer();
+let server = http.createServer();
 
 // request イベント処理関数をセット
-server.on( 'request', doRequest );
+server.on('request', doRequest);
 
 // 待ち受けスタート
-server.listen( process.env.VMC_APP_PORT || 2000 );
-console.log( "[main.js] Server running!" );
+server.listen(process.env.VMC_APP_PORT || 2000);
+console.log("[main.js] Server running!");
 
 // request イベント処理
 function doRequest(
   req,    // http.IncomingMessage オブジェクト : クライアントからのリクエストに関する機能がまとめられている
   res     // http.serverResponse  オブジェクト : サーバーからクライアントへ戻されるレスポンスに関する機能がまとめられている
 ){
-  switch( req.url ){
+  switch(req.url) {
   case '/':
-    fs.readFile( './app/app.html', 'UTF-8',
-      function( err, data ){
-        if( err ){
-          res.writeHead( 404, {'Content-Type': 'text/html'} );
-          res.write( 'File Not Found.' );
-          res.end();
-          return;
-        }
-        res.writeHead( 200, {'Content-Type': 'text/html',
-                             'Access-Control-Allow-Origin': '*'
-                      } );
-        res.write( data );
+    fs.readFile('./app/app.html', 'UTF-8', function(err, data) {
+      if(err) {
+        res.writeHead(404, {'Content-Type': 'text/html'});
+        res.write('File Not Found.');
         res.end();
+        return;
       }
-    );
+      res.writeHead(200, {'Content-Type': 'text/html',
+                          'Access-Control-Allow-Origin': '*'
+                   });
+      res.write(data);
+      res.end();
+    });
   break;
   case '/app.js':
-    fs.readFile( './app/app.js', 'UTF-8',
-      function( err, data ){
-        res.writeHead( 200, {'Content-Type': 'application/javascript',
-                             'Access-Control-Allow-Origin': '*'
-                      } );
-        res.write( data );
-        res.end();
-      }
-    );
+    fs.readFile('./app/app.js', 'UTF-8', function(err, data) {
+      res.writeHead(200, {'Content-Type': 'application/javascript',
+                          'Access-Control-Allow-Origin': '*'
+                   });
+      res.write(data);
+      res.end();
+    });
   break;
   case '/style.css':
-    fs.readFile( './app/style.css', 'UTF-8',
-      function( err, data ){
-        res.writeHead( 200, {'Content-Type': 'text/css',
-                             'Access-Control-Allow-Origin': '*'
-                      } );
-        res.write( data );
-        res.end();
-      }
-    );
+    fs.readFile('./app/style.css', 'UTF-8', function(err, data) {
+      res.writeHead(200, {'Content-Type': 'text/css',
+                          'Access-Control-Allow-Origin': '*'
+                   });
+      res.write(data);
+      res.end();
+    });
   break;
   }
 }
 
 
-var io = socketio.listen( server );
+let io = socketio.listen(server);
 
 
 //-----------------------------------------------------------------------------
 // 起動の処理関数
 //-----------------------------------------------------------------------------
-var timerFlg;
+let timerFlg;
 
-var persons = new DataPersons();
-var room    = new DataRoom();
+let persons = new DataPersons();
+let room    = new DataRoom();
 
 
 startSystem();
@@ -111,46 +105,46 @@ startSystem();
  * startSystem();
 */
 function startSystem() {
-  console.log( "[main.js] startSystem()" );
+  console.log("[main.js] startSystem()");
 };
 
 
 //-----------------------------------------------------------------------------
-// クライアントからコネクションが来た時の処理関数 ( Express )
+// クライアントからコネクションが来た時の処理関数 (Express)
 //-----------------------------------------------------------------------------
-ex_app.get("/api/ranking", function(req, res, next){
-  console.log( "[main.js] ex_app.get( \"/api/ranking\" )" );
+ex_app.get("/api/ranking", function(req, res, next) {
+  console.log("[main.js] ex_app.get(\"/api/ranking\")");
 
-  var obj = persons.getRankingTop50( function( err, doc ){
-    console.log( "[main.js] err     = " + err );
-    console.log( "[main.js] doc     = " + JSON.stringify(doc) );
-    res.json( doc );
+  let obj = persons.getRankingTop50(function(err, doc) {
+    console.log("[main.js] err     = " + err);
+    console.log("[main.js] doc     = " + JSON.stringify(doc));
+    res.json(doc);
   });
 });
 
 
-ex_app.get("/api/gid/:gid", function(req, res, next){
-  console.log( "[main.js] ex_app.get( \"/api/gid/:gid\" )" );
+ex_app.get("/api/gid/:gid", function(req, res, next) {
+  console.log("[main.js] ex_app.get(\"/api/gid/:gid\")");
 
-  var target = { 'gid': req.params.gid };
+  let target = { 'gid': req.params.gid };
 
-  var obj = persons.query( target, function( err, doc ){
-    console.log( "[main.js] err     = " + err );
-    console.log( "[main.js] doc     = " + JSON.stringify(doc) );
-    res.json( doc );
+  let obj = persons.query(target, function(err, doc) {
+    console.log("[main.js] err     = " + err);
+    console.log("[main.js] doc     = " + JSON.stringify(doc));
+    res.json(doc);
   });
 });
 
 
-ex_app.get("/api/date/:date", function(req, res, next){
-  console.log( "[main.js] ex_app.get( \"/api/date/:date\" )" );
+ex_app.get("/api/date/:date", function(req, res, next) {
+  console.log("[main.js] ex_app.get(\"/api/date/:date\")");
 
-  var target = req.params.date;
+  let target = req.params.date;
 
-  var obj = room.getOneDay( target, function( err, doc ){
-    console.log( "[main.js] err     = " + err );
-    console.log( "[main.js] doc     = " + JSON.stringify(doc) );
-    res.json( doc );
+  let obj = room.getOneDay(target, function(err, doc) {
+    console.log("[main.js] err     = " + err);
+    console.log("[main.js] doc     = " + JSON.stringify(doc));
+    res.json(doc);
   });
 });
 
@@ -158,45 +152,45 @@ ex_app.get("/api/date/:date", function(req, res, next){
 //-----------------------------------------------------------------------------
 // クライアントからコネクションが来た時の処理関数
 //-----------------------------------------------------------------------------
-io.sockets.on( 'connection', function( socket ){
+io.sockets.on('connection', function(socket) {
 
   // 切断したときに送信
-  socket.on( 'disconnect', function(){
-    console.log( "[main.js] " + 'disconnect' );
+  socket.on('disconnect', function() {
+    console.log("[main.js] " + 'disconnect');
 //  io.sockets.emit('S_to_C_DATA', {value:'user disconnected'});
   });
 
 
   // Client to Server
-  socket.on( 'C_to_S_NEW', function( data ){
-    console.log( "[main.js] " + 'C_to_S_NEW' );
+  socket.on('C_to_S_NEW', function(data) {
+    console.log("[main.js] " + 'C_to_S_NEW');
   });
 
 
-  socket.on( 'C_to_S_DELETE', function( data ){
-    console.log( "[main.js] " + 'C_to_S_DELETE' );
+  socket.on('C_to_S_DELETE', function(data) {
+    console.log("[main.js] " + 'C_to_S_DELETE');
   });
 
 
-  socket.on( 'C_to_S_GET_VISITOR', function(){
-    console.log( "[main.js] " + 'C_to_S_GET_VISITOR' );
+  socket.on('C_to_S_GET_VISITOR', function() {
+    console.log("[main.js] " + 'C_to_S_GET_VISITOR');
 
-    var obj = persons.getRankingTop50( function( err, doc ){
-      console.log( "[main.js] err     = " + err );
+    let obj = persons.getRankingTop50(function(err, doc) {
+      console.log("[main.js] err     = " + err);
 
-      console.log( "[main.js] doc     = " + JSON.stringify(doc) );
-      io.sockets.emit( 'S_to_C_VISITOR', doc );
+      console.log("[main.js] doc     = " + JSON.stringify(doc));
+      io.sockets.emit('S_to_C_VISITOR', doc);
     });
   });
 
 
-  socket.on( 'C_to_S_GET_VISITOR_ONE_DAY', function( data ){
-    console.log( "[main.js] " + 'C_to_S_GET_VISITOR_ONE_DAY' );
-    console.log( "[main.js] data.date   = " + data.date );
+  socket.on('C_to_S_GET_VISITOR_ONE_DAY', function(data) {
+    console.log("[main.js] " + 'C_to_S_GET_VISITOR_ONE_DAY');
+    console.log("[main.js] data.date   = " + data.date);
 
-    var obj = room.getOneDay( data.date, function( err, data ){
-//      console.log( "[main.js] data     = " + JSON.stringify(data) );
-      io.sockets.emit( 'S_to_C_VISITOR_ONE_DAY', {ret:err, value:data} );
+    let obj = room.getOneDay(data.date, function(err, data) {
+//      console.log("[main.js] data     = " + JSON.stringify(data));
+      io.sockets.emit('S_to_C_VISITOR_ONE_DAY', {ret:err, value:data});
     });
   });
 
@@ -209,13 +203,13 @@ io.sockets.on( 'connection', function( socket ){
  * @param {number} num - 数値
  * @return {number} num - 0 埋めされた 2 桁の数値
  * @example
- * toDoubleDigits( 8 );
+ * toDoubleDigits(8);
 */
-var toDoubleDigits = function( num ){
-//  console.log( "[main.js] toDoubleDigits()" );
-//  console.log( "[main.js] num = " + num );
+let toDoubleDigits = function(num) {
+//  console.log("[main.js] toDoubleDigits()");
+//  console.log("[main.js] num = " + num);
   num += '';
-  if( num.length === 1 ){
+  if(num.length === 1) {
     num = '0' + num;
   }
   return num;
@@ -229,16 +223,16 @@ var toDoubleDigits = function( num ){
  * @example
  * yyyymmdd();
 */
-var yyyymmdd = function(){
-  console.log( "[main.js] yyyymmdd()" );
-  var date = new Date();
+let yyyymmdd = function() {
+  console.log("[main.js] yyyymmdd()");
+  let date = new Date();
 
-  var yyyy = date.getFullYear();
-  var mm   = toDoubleDigits( date.getMonth() + 1 );
-  var dd   = toDoubleDigits( date.getDate() );
+  let yyyy = date.getFullYear();
+  let mm   = toDoubleDigits(date.getMonth() + 1);
+  let dd   = toDoubleDigits(date.getDate());
 
-  var day = yyyy + '-' + mm + '-' + dd;
-  console.log( "[main.js] day = " + day );
+  let day = yyyy + '-' + mm + '-' + dd;
+  console.log("[main.js] day = " + day);
   return day;
 };
 
@@ -250,16 +244,16 @@ var yyyymmdd = function(){
  * @example
  * hhmmss();
 */
-var hhmmss = function(){
-  console.log( "[main.js] hhmmss()" );
-  var date = new Date();
+let hhmmss = function() {
+  console.log("[main.js] hhmmss()");
+  let date = new Date();
 
-  var hour = toDoubleDigits( date.getHours() );
-  var min  = toDoubleDigits( date.getMinutes() );
-  var sec  = toDoubleDigits( date.getSeconds() );
+  let hour = toDoubleDigits(date.getHours());
+  let min  = toDoubleDigits(date.getMinutes());
+  let sec  = toDoubleDigits(date.getSeconds());
 
-  var time = hour + ':' + min + ':' + sec;
-  console.log( "[main.js] time = " + time );
+  let time = hour + ':' + min + ':' + sec;
+  console.log("[main.js] time = " + time);
   return time;
 };
 

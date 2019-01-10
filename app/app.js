@@ -3,78 +3,80 @@
  * @author       Ryoji Morita
  * @version      0.0.1
 */
-var sv_ip   = 'reception.rp.lfx.sony.co.jp';  // node.js server の IP アドレス
-//var sv_ip   = '43.2.100.151';               // node.js server の IP アドレス
-//var sv_ip   = '192.168.91.11';              // node.js server の IP アドレス
-var sv_port = 2000;                           // node.js server の port 番号
+let sv_ip   = 'reception.rp.lfx.sony.co.jp';  // node.js server の IP アドレス
+//let sv_ip   = '43.2.100.151';               // node.js server の IP アドレス
+//let sv_ip   = '192.168.91.11';              // node.js server の IP アドレス
+let sv_port = 2000;                           // node.js server の port 番号
 
-var server = io.connect( 'http://' + sv_ip + ':' + sv_port ); //ローカル
+let server = io.connect('http://' + sv_ip + ':' + sv_port); //ローカル
 
 
 //-----------------------------------------------------------------------------
 //-------------------------------------
-var obj_visitor_ranking = {chart:null, data:null, type:'column', color:'#5D4037', title:'訪問数ランキング', unit:'[回]'};
-var obj_visitor_daily   = {chart:null, data:null, type:'column', color:'#8D6E63', title:'一日のデータ', unit:'[人]'};
+let obj_visitor_ranking = {chart:null, data:null, type:'column', color:'#5D4037', title:'訪問数ランキング', unit:'[回]'};
+let obj_visitor_daily   = {chart:null, data:null, type:'column', color:'#8D6E63', title:'一日のデータ', unit:'[人]'};
 
 
 // ブラウザオブジェクトから受け取るイベント
-window.onload = function(){
-  console.log( "[app.js] window.onloaded" );
+window.onload = function() {
+  console.log("[app.js] window.onloaded");
 
-  obj_visitor_ranking = makeChartVisitorRanking( 'cid_visitor_ranking', obj_visitor_ranking );
+  obj_visitor_ranking = makeChartVisitorRanking('cid_visitor_ranking', obj_visitor_ranking);
   obj_visitor_ranking.chart.render();
 
-  obj_visitor_daily = makeChartDaily( 'cid_visitor_daily', obj_visitor_daily );
+  obj_visitor_daily = makeChartDaily('cid_visitor_daily', obj_visitor_daily);
   obj_visitor_daily.chart.render();
 
-  console.log( "[app.js] server.emit(" + 'C_to_S_GET_VISITOR' + ")" );
-  server.emit( 'C_to_S_GET_VISITOR' );
+  console.log("[app.js] server.emit(" + 'C_to_S_GET_VISITOR' + ")");
+  server.emit('C_to_S_GET_VISITOR');
 };
 
 
-window.onunload = function(){
-  console.log( "[app.js] window.onunloaded" );
+window.onunload = function() {
+  console.log("[app.js] window.onunloaded");
 };
 
 
 /**
- * 1 day のデータを表示するグラフ ( チャート ) を作成する。
+ * 1 day のデータを表示するグラフ (チャート) を作成する。
  * @param {string} domid - グラフを表示する DOM の ID 名
  * @param {object} obj - グラフ化する対象のオブジェクト
  * @return {string} chart - 作成するグラフのオブジェクトとデータ
  * @example
- * makeChartDaily( 'cid_visitor_daily', obj_visitor_daily );
+ * makeChartDaily('cid_visitor_daily', obj_visitor_daily);
 */
-function makeChartDaily( domid, obj ){
-  console.log( "[app.js] makeChartDaily()" );
-  console.log( "[app.js] domid = " + domid );
+function makeChartDaily(domid, obj) {
+  console.log("[app.js] makeChartDaily()");
+  console.log("[app.js] domid = " + domid);
 
-  var data = new Array({label:'00-00', y:0}, {label:'01-00', y:0}, {label:'02-00', y:0}, {label:'03-00', y:0},
+  let data = new Array({label:'00-00', y:0}, {label:'01-00', y:0}, {label:'02-00', y:0}, {label:'03-00', y:0},
                        {label:'04-00', y:0}, {label:'05-00', y:0}, {label:'06-00', y:0}, {label:'07-00', y:0},
                        {label:'08-00', y:0}, {label:'09-00', y:0}, {label:'10-00', y:0}, {label:'11-00', y:0},
                        {label:'12-00', y:0}, {label:'13-00', y:0}, {label:'14-00', y:0}, {label:'15-00', y:0},
                        {label:'16-00', y:0}, {label:'17-00', y:0}, {label:'18-00', y:0}, {label:'19-00', y:0},
                        {label:'20-00', y:0}, {label:'21-00', y:0}, {label:'22-00', y:0}, {label:'23-00', y:0}
-                      );
+                     );
 
-  var chart = new CanvasJS.Chart(domid, {
-    animationEnabled: true,
+  let chart = new CanvasJS.Chart(domid, {
+    animationEnabled:  true,
     animationDuration: 2000,
-    title:{text: obj.title,
-           fontColor: '#222',
-           fontSize: 16,
+    title: {
+      text:      obj.title,
+      fontColor: '#222',
+      fontSize:  16,
     },
-    subtitles:[{text: '単位: ' + obj.unit,
-                fontColor: '#555',
-                fontSize: 12,
-               }
-    ],
+    subtitles: [{
+      text:      '単位: ' + obj.unit,
+      fontColor: '#555',
+      fontSize:  12,
+    }],
     axisX: { labelAngle:-45, labelFontSize:14, labelFontColor:'#222' },
     axisY: { labelFontSize:14, labelFontColor:'#222' },
-    data: [{type: obj.type,           // グラフの種類 (area, bar, bubble, column, stackedColumn )
-            color: obj.color,
-            cursor: 'pointer',
-            dataPoints: data        // グラフに描画するデータ
+    data: [{
+      type:        obj.type,           // グラフの種類 (area, bar, bubble, column, stackedColumn)
+      color:       obj.color,
+      cursor:     'pointer',
+      dataPoints: data        // グラフに描画するデータ
     }]
   });
 
@@ -83,37 +85,39 @@ function makeChartDaily( domid, obj ){
 
 
 /**
- * 訪問回数ランキングを表示するグラフ ( チャート ) を作成する。
+ * 訪問回数ランキングを表示するグラフ (チャート) を作成する。
  * @param {string} domid - グラフを表示する DOM の ID 名
  * @param {object} obj - グラフ化する対象のオブジェクト
  * @return {string} chart - 作成するグラフのオブジェクトとデータ
  * @example
- * makeChartVisitorRanking( 'cid_visitor_daily', obj_visitor_daily );
+ * makeChartVisitorRanking('cid_visitor_daily', obj_visitor_daily);
 */
-function makeChartVisitorRanking( domid, obj ){
-  console.log( "[app.js] makeChartVisitorRanking()" );
-  console.log( "[app.js] domid = " + domid );
+function makeChartVisitorRanking(domid, obj) {
+  console.log("[app.js] makeChartVisitorRanking()");
+  console.log("[app.js] domid = " + domid);
 
-  var data = new Array();
+  let data = new Array();
 
-  var chart = new CanvasJS.Chart(domid, {
-    animationEnabled: true,
+  let chart = new CanvasJS.Chart(domid, {
+    animationEnabled:  true,
     animationDuration: 2000,
-    title:{text: obj.title,
-           fontColor: '#222',
-           fontSize: 16,
+    title:{
+      text:      obj.title,
+      fontColor: '#222',
+      fontSize:  16,
     },
-    subtitles:[{text: '単位: ' + obj.unit,
-                fontColor: '#555',
-                fontSize: 12,
-               }
-    ],
+    subtitles:[{
+      text:      '単位: ' + obj.unit,
+      fontColor: '#555',
+      fontSize:  12,
+    }],
     axisX: { labelAngle:-90, labelFontSize:10, labelFontColor:'#222' },
     axisY: { minimum: 0, labelFontSize:14, labelFontColor:'#222' },
-    data: [{type: obj.type,           // グラフの種類 (area, bar, bubble, column, stackedColumn )
-            color: obj.color,
-            cursor: 'pointer',
-            dataPoints: data        // グラフに描画するデータ
+    data: [{
+      type:       obj.type,           // グラフの種類 (area, bar, bubble, column, stackedColumn)
+      color:      obj.color,
+      cursor:     'pointer',
+      dataPoints: data        // グラフに描画するデータ
     }]
   });
 
@@ -123,44 +127,44 @@ function makeChartVisitorRanking( domid, obj ){
 
 //-----------------------------------------------------------------------------
 // サーバから受け取るイベント
-server.on( 'connect', function(){               // 接続時
-  console.log( "[app.js] " + 'connected' );
+server.on('connect', function() {               // 接続時
+  console.log("[app.js] " + 'connected');
 });
 
 
-server.on( 'disconnect', function( client ){    // 切断時
-  console.log( "[app.js] " + 'disconnected' );
+server.on('disconnect', function( client) {    // 切断時
+  console.log("[app.js] " + 'disconnected');
 });
 
 
-server.on( 'S_to_C_DATA', function( data ){
-  console.log( "[app.js] " + 'S_to_C_DATA' );
-  console.log( "[app.js] data = " + data.value );
-//  window.alert( 'コマンドを送信しました。\n\r' + data.value );
+server.on('S_to_C_DATA', function(data) {
+  console.log("[app.js] " + 'S_to_C_DATA');
+  console.log("[app.js] data = " + data.value);
+//  window.alert('コマンドを送信しました。\n\r' + data.value);
 });
 
 
-server.on( 'S_to_C_VISITOR_ONE_DAY', function( data ){
-  console.log( "[app.js] " + 'S_to_C_VISITOR_ONE_DAY' );
-  console.log( "[app.js] data.value = " + JSON.stringify(data.value) );
+server.on('S_to_C_VISITOR_ONE_DAY', function(data) {
+  console.log("[app.js] " + 'S_to_C_VISITOR_ONE_DAY');
+  console.log("[app.js] data.value = " + JSON.stringify(data.value));
 
-  if( data.ret == false ){
-    alert( 'データがありません。\n\r' );
+  if(data.ret == false) {
+    alert('データがありません。\n\r');
   }
 
-  updateChartDaily( obj_visitor_daily, data.value );
+  updateChartDaily(obj_visitor_daily, data.value);
 });
 
 
-server.on( 'S_to_C_VISITOR', function( data ){
-  console.log( "[app.js] " + 'S_to_C_VISITOR' );
-  console.log( "[app.js] data = " + JSON.stringify(data) );
+server.on('S_to_C_VISITOR', function(data) {
+  console.log("[app.js] " + 'S_to_C_VISITOR');
+  console.log("[app.js] data = " + JSON.stringify(data));
 
-  if( data.ret == false ){
-    alert( 'データがありません。\n\r' );
+  if(data.ret == false) {
+    alert('データがありません。\n\r');
   }
 
-  updateChartVisitorRanking( '訪問数ランキング', data );
+  updateChartVisitorRanking('訪問数ランキング', data);
 });
 
 
@@ -171,15 +175,15 @@ server.on( 'S_to_C_VISITOR', function( data ){
  * @param {object} data - グラフに表示するデータ
  * @return {void}
  * @example
- * updateChartDaily( 'temp', obj );
+ * updateChartDaily('temp', obj);
 */
-function updateChartDaily( obj_chart, data ){
-  console.log( "[app.js] updateChartDaily()" );
+function updateChartDaily(obj_chart, data) {
+  console.log("[app.js] updateChartDaily()");
 
-//  var obj = (new Function('return ' + data))();
+//  let obj = (new Function('return ' + data))();
 
-  var i = 0;
-  for( var key in data ){
+  let i = 0;
+  for(let key in data) {
     obj_chart.data[i].label = key;
     obj_chart.data[i].y     = data[key];
     i++;
@@ -197,18 +201,17 @@ function updateChartDaily( obj_chart, data ){
  * @param {object} data - グラフに表示するデータ
  * @return {void}
  * @example
- * updateChartVisitorRanking( 'temp', obj );
+ * updateChartVisitorRanking('temp', obj);
 */
-function updateChartVisitorRanking( title, data ){
-  console.log( "[app.js] updateChartVisitorRanking()" );
-  console.log( "[app.js] title = " + title );
+function updateChartVisitorRanking(title, data) {
+  console.log("[app.js] updateChartVisitorRanking()");
+  console.log("[app.js] title = " + title);
 
-  console.log( "[app.js] data = " + JSON.stringify(data) );
+  console.log("[app.js] data = " + JSON.stringify(data));
 
   obj_visitor_ranking.data.length = 0;
-  var i = 0;
-  for( i = 0; i < data.length; i++ ){
-    obj_visitor_ranking.data.push( {label:data[i].name, y:data[i].cnt} );
+  for(let value of data) {
+    obj_visitor_ranking.data.push({label: value.name, y: value.cnt});
   }
 
   obj_visitor_ranking.chart.options.title.text = title;
@@ -228,19 +231,19 @@ function updateChartVisitorRanking( title, data ){
  * @example
  * sendGetCmdVisitorOneDay();
 */
-function sendGetCmdVisitorOneDay(){
-  console.log( "[app.js] sendGetCmdVisitorOneDay()" );
+function sendGetCmdVisitorOneDay() {
+  console.log("[app.js] sendGetCmdVisitorOneDay()");
 
-  var date   = $('#val_date_visitor').val();
-  console.log( "[app.js] date   = " + date );
+  let date   = $('#val_date_visitor').val();
+  console.log("[app.js] date   = " + date);
 
-  if( date < '2018-08-20' ){
-    alert( "2018/08/20 以降を指定してください。" );
+  if(date < '2018-08-20') {
+    alert("2018/08/20 以降を指定してください。");
   }
 
-  var obj = { date:date };
-  console.log( "[app.js] server.emit(" + 'C_to_S_GET_VISITOR_ONE_DAY' + ")" );
-  server.emit( 'C_to_S_GET_VISITOR_ONE_DAY', obj );
+  let obj = {date:date};
+  console.log("[app.js] server.emit(" + 'C_to_S_GET_VISITOR_ONE_DAY' + ")");
+  server.emit('C_to_S_GET_VISITOR_ONE_DAY', obj);
 }
 
 

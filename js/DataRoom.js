@@ -7,8 +7,10 @@
 'use strict';
 
 // 必要なライブラリをロード
-var fs = require( 'fs' );
-var MongoClient  = require( 'mongodb' ).MongoClient;
+require('date-utils');
+
+const ApiCmn = require('./ApiCmn');
+let g_apiCmn = new ApiCmn();
 
 
 /**
@@ -16,68 +18,57 @@ var MongoClient  = require( 'mongodb' ).MongoClient;
  * @param {void}
  * @constructor
  * @example
- * var obj = new DataRoom();
+ * let obj = new DataRoom();
 */
-var DataRoom = function(){
-  /**
-   * MongoDB のデータベース名
-   * @type {string}
-  */
-  this.nameDatabase = 'room';
+class DataRoom {
+
+  constructor(jsonObj) {
+    this.data = {
+      cnt: 0,             // @type {number} : 総入場者数
+    };
+
+    this.data = jsonObj;
+  }
+
 
   /**
-   * MongoDB の URL
-   * @type {string}
+   * this.data を取得する。
+   * @param {void}
+   * @return {object} - this.data
+   * @example
+   * get();
   */
-  this.mongo_url = 'mongodb://localhost:27017/';
+  get() {
+    return this.data;
+  }
+
 
   /**
-   * 入場者数カウンタ
-   * @type {Object}
+   * this.data に値をセットする。
+   * @param {object} - セットする json 形式のデータ
+   * @return {void}
+   * @example
+   * set();
   */
-  this.cnt = 0;
+  set(jsonObj) {
+    this.data = jsonObj;
+  }
+
+
+  /**
+   * this.data.cnt を更新する。
+   * @param {void}
+   * @return {void}
+   * @example
+   * updateCnt();
+  */
+  updateCnt() {
+    console.log("[DataRoom.js] updateCnt()");
+    this.data.cnt++;
+  }
+
+
 };
-
-
-/**
- * 入場者数カウンタをクリアする
- * @param {void}
- * @return {void}
- * @example
- * clear();
-*/
-DataRoom.prototype.clear = function(){
-  console.log( "[DataRoom.js] clear()" );
-  this.cnt = 0;
-}
-
-
-/**
- * 入場者数カウンタを更新する
- * @param {void}
- * @return {void}
- * @example
- * update();
-*/
-DataRoom.prototype.update = function(){
-  console.log( "[DataRoom.js] update()" );
-  this.cnt++;
-  console.log( "[DataRoom.js] cnt = " + this.cnt );
-}
-
-
-/**
- * 入場者数カウンタを取得する
- * @param {void}
- * @return {void}
- * @example
- * get();
-*/
-DataRoom.prototype.get = function(){
-  console.log( "[DataRoom.js] get()" );
-  console.log( "[DataRoom.js] cnt = " + this.cnt );
-  return this.cnt;
-}
 
 
 /**
@@ -91,13 +82,13 @@ DataRoom.prototype.get = function(){
 DataRoom.prototype.createDoc = function( day, hour ){
   console.log( "[DataRoom.js] createDoc()" );
 
-  var doc = { hour: hour, cnt: this.cnt };
+  let doc = { hour: hour, cnt: this.cnt };
 
   MongoClient.connect( this.mongo_url, function(err, db){
     if( err ) throw err;
 
-    var dbo = db.db( 'room' );        // データベースを取得する
-    var clo = dbo.collection( day );  // コレクションを取得する
+    let dbo = db.db( 'room' );        // データベースを取得する
+    let clo = dbo.collection( day );  // コレクションを取得する
 
     // doc をデータベースに insert する
     clo.insertOne( doc, function(err, res){
@@ -127,7 +118,7 @@ DataRoom.prototype.getOneDay = function( day, callback ){
   console.log( "[DataRoom.js] getOneDay()" );
   console.log( "[DataRoom.js] day    = " + day );
 
-  var data = { '00-00': 0, '01-00': 0, '02-00': 0, '03-00': 0, '04-00': 0, '05-00': 0,
+  let data = { '00-00': 0, '01-00': 0, '02-00': 0, '03-00': 0, '04-00': 0, '05-00': 0,
                '06-00': 0, '07-00': 0, '08-00': 0, '09-00': 0, '10-00': 0, '11-00': 0,
                '12-00': 0, '13-00': 0, '14-00': 0, '15-00': 0, '16-00': 0, '17-00': 0,
                '18-00': 0, '19-00': 0, '20-00': 0, '21-00': 0, '22-00': 0, '23-00': 0
@@ -136,26 +127,26 @@ DataRoom.prototype.getOneDay = function( day, callback ){
   MongoClient.connect( this.mongo_url, function(err, db){
     if( err ) throw err;
 
-    var dbo = db.db( 'room' );        // データベースを取得する
-    var clo = dbo.collection( day );  // コレクションを取得する
+    let dbo = db.db( 'room' );        // データベースを取得する
+    let clo = dbo.collection( day );  // コレクションを取得する
 
     // コレクションに含まれるすべてのドキュメントを取得する
     clo.find( {} ).toArray( function(err, docs){
       try{
         if( err ) throw err;
 
-        var i = 0;
-        var len = docs.length;
+        let i = 0;
+        let len = docs.length;
         console.log( "[DataRoom.js] len = " + len );
 
         for( i = 0; i < len; i++ ){
-          var hour = docs[i].hour;
+          let hour = docs[i].hour;
 
           hour = hour.replace( ':', '-' );    // hh:mm を hh-mm の形式に置換する
 
           data[ hour ] = docs[i].cnt;
         }
-        var ret = false;
+        let ret = false;
         if( len == 24 ){
           ret = true;
         }
@@ -181,32 +172,32 @@ DataRoom.prototype.getOneDay = function( day, callback ){
  * @param {string} file - 対象のファイル ( フルパス )
  * @return {Object} ret - 読み出したデータ
  * @example
- * var obj = updateOneDay( '/media/pi/USBDATA/2018-01-23_room.txt' );
+ * let obj = updateOneDay( '/media/pi/USBDATA/2018-01-23_room.txt' );
 */
 DataRoom.prototype.updateOneDay = function( file ){
   console.log( "[DataRoom.js] updateOneDay()" );
   console.log( "[DataRoom.js] file = " + file );
 
-  var date = file.replace( '/media/pi/USBDATA/', '' );
+  let date = file.replace( '/media/pi/USBDATA/', '' );
   date = date.replace( '_room.txt', '' );
 
   this.date = date;
   console.log( "[DataRoom.js] this.date = " + this.date );
 
-  var ret = false;
+  let ret = false;
   try{
     fs.statSync( file );
-    var ret = fs.readFileSync( file, 'utf8');
-    var obj = (new Function("return " + ret))();
+    let ret = fs.readFileSync( file, 'utf8');
+    let obj = (new Function("return " + ret))();
 
-    for( var key in this.dataOneDay ){
+    for( let key in this.dataOneDay ){
       this.dataOneDay[key] = obj[key];
     }
     console.log( '[DataRoom.js] this.dataOneDay = ' + JSON.stringify(this.dataOneDay) );
   } catch( err ){
     if( err.code === 'ENOENT' ){
       console.log( "[DataRoom.js] file does not exist." );
-      for( var key in this.dataOneDay ){
+      for( let key in this.dataOneDay ){
         this.dataOneDay[key] = 0;
       }
       ret = false
@@ -228,9 +219,9 @@ DataRoom.prototype.appendFile = function( file ){
   console.log( "[DataRoom.js] file = " + file );
 
 
-  var date = new Date();
-  var hour = toDoubleDigits( date.getHours() );
-  var str = '';
+  let date = new Date();
+  let hour = toDoubleDigits( date.getHours() );
+  let str = '';
 
   if( hour == '00' ){
     str += '{';
@@ -269,7 +260,7 @@ DataRoom.prototype.appendFile = function( file ){
  * @example
  * toDoubleDigits( 8 );
 */
-var toDoubleDigits = function( num ){
+let toDoubleDigits = function( num ){
   console.log( "[DataRoom.js] toDoubleDigits()" );
   console.log( "[DataRoom.js] num = " + num );
   num += '';
