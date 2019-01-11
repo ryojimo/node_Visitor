@@ -13,7 +13,7 @@ require('date-utils');
 let schedule = require('node-schedule');
 let express  = require('express');
 
-const DataPersons = require('./js/DataPersons');
+const DataPerson = require('./js/DataPerson');
 const DataRoom    = require('./js/DataRoom');
 
 
@@ -88,10 +88,8 @@ let io = socketio.listen(server);
 //-----------------------------------------------------------------------------
 // 起動の処理関数
 //-----------------------------------------------------------------------------
-let timerFlg;
-
-let persons = new DataPersons();
-let room    = new DataRoom();
+let g_dataPerson = new DataPerson();
+let g_dataRoom   = new DataRoom();
 
 
 startSystem();
@@ -115,7 +113,7 @@ function startSystem() {
 ex_app.get("/api/ranking", function(req, res, next) {
   console.log("[main.js] ex_app.get(\"/api/ranking\")");
 
-  let obj = persons.getRankingTop50(function(err, doc) {
+  let obj = g_dataPerson.getRankingTop50(function(err, doc) {
     console.log("[main.js] err     = " + err);
     console.log("[main.js] doc     = " + JSON.stringify(doc));
     res.json(doc);
@@ -128,7 +126,7 @@ ex_app.get("/api/gid/:gid", function(req, res, next) {
 
   let target = { 'gid': req.params.gid };
 
-  let obj = persons.query(target, function(err, doc) {
+  let obj = g_dataPerson.query(target, function(err, doc) {
     console.log("[main.js] err     = " + err);
     console.log("[main.js] doc     = " + JSON.stringify(doc));
     res.json(doc);
@@ -141,7 +139,7 @@ ex_app.get("/api/date/:date", function(req, res, next) {
 
   let target = req.params.date;
 
-  let obj = room.getOneDay(target, function(err, doc) {
+  let obj = g_dataRoom.getOneDay(target, function(err, doc) {
     console.log("[main.js] err     = " + err);
     console.log("[main.js] doc     = " + JSON.stringify(doc));
     res.json(doc);
@@ -175,7 +173,7 @@ io.sockets.on('connection', function(socket) {
   socket.on('C_to_S_GET_VISITOR', function() {
     console.log("[main.js] " + 'C_to_S_GET_VISITOR');
 
-    let obj = persons.getRankingTop50(function(err, doc) {
+    let obj = g_dataPerson.getRankingTop50(function(err, doc) {
       console.log("[main.js] err     = " + err);
 
       console.log("[main.js] doc     = " + JSON.stringify(doc));
@@ -188,7 +186,7 @@ io.sockets.on('connection', function(socket) {
     console.log("[main.js] " + 'C_to_S_GET_VISITOR_ONE_DAY');
     console.log("[main.js] data.date   = " + data.date);
 
-    let obj = room.getOneDay(data.date, function(err, data) {
+    let obj = g_dataRoom.getOneDay(data.date, function(err, data) {
 //      console.log("[main.js] data     = " + JSON.stringify(data));
       io.sockets.emit('S_to_C_VISITOR_ONE_DAY', {ret:err, value:data});
     });
