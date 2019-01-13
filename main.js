@@ -9,9 +9,8 @@ let http     = require('http');
 let socketio = require('socket.io');
 let fs       = require('fs');
 let colors   = require('colors');
-require('date-utils');
 let schedule = require('node-schedule');
-let express  = require('express');
+require('date-utils');
 
 const DataPerson = require('./js/DataPerson');
 const DataRoom    = require('./js/DataRoom');
@@ -21,13 +20,6 @@ const DataRoom    = require('./js/DataRoom');
 let now = new Date();
 console.log("[main.js] " + now.toFormat("YYYY年MM月DD日 HH24時MI分SS秒").rainbow);
 console.log("[main.js] " + "ver.01 : app.js".rainbow);
-console.log("[main.js] " + "access to http://localhost:2000");
-
-// Express オブジェクトを生成
-let ex_app = express();
-let ex_server = ex_app.listen(2001, function() {
-    console.log("[main.js] " + "Node.js is listening to PORT:" + ex_server.address().port);
-});
 
 // サーバー・オブジェクトを生成
 let server = http.createServer();
@@ -36,7 +28,9 @@ let server = http.createServer();
 server.on('request', doRequest);
 
 // 待ち受けスタート
-server.listen(process.env.VMC_APP_PORT || 2000);
+const PORT = 4003;
+server.listen(process.env.VMC_APP_PORT || PORT);
+console.log("[main.js] access to http://localhost:" + PORT);
 console.log("[main.js] Server running!");
 
 // request イベント処理
@@ -108,46 +102,6 @@ function startSystem() {
 
 
 //-----------------------------------------------------------------------------
-// クライアントからコネクションが来た時の処理関数 (Express)
-//-----------------------------------------------------------------------------
-ex_app.get("/api/ranking", function(req, res, next) {
-  console.log("[main.js] ex_app.get(\"/api/ranking\")");
-
-  let obj = g_dataPerson.getRankingTop50(function(err, doc) {
-    console.log("[main.js] err     = " + err);
-    console.log("[main.js] doc     = " + JSON.stringify(doc));
-    res.json(doc);
-  });
-});
-
-
-ex_app.get("/api/gid/:gid", function(req, res, next) {
-  console.log("[main.js] ex_app.get(\"/api/gid/:gid\")");
-
-  let target = { 'gid': req.params.gid };
-
-  let obj = g_dataPerson.query(target, function(err, doc) {
-    console.log("[main.js] err     = " + err);
-    console.log("[main.js] doc     = " + JSON.stringify(doc));
-    res.json(doc);
-  });
-});
-
-
-ex_app.get("/api/date/:date", function(req, res, next) {
-  console.log("[main.js] ex_app.get(\"/api/date/:date\")");
-
-  let target = req.params.date;
-
-  let obj = g_dataRoom.getOneDay(target, function(err, doc) {
-    console.log("[main.js] err     = " + err);
-    console.log("[main.js] doc     = " + JSON.stringify(doc));
-    res.json(doc);
-  });
-});
-
-
-//-----------------------------------------------------------------------------
 // クライアントからコネクションが来た時の処理関数
 //-----------------------------------------------------------------------------
 io.sockets.on('connection', function(socket) {
@@ -174,9 +128,8 @@ io.sockets.on('connection', function(socket) {
     console.log("[main.js] " + 'C_to_S_GET_VISITOR');
 
     let obj = g_dataPerson.getRankingTop50(function(err, doc) {
-      console.log("[main.js] err     = " + err);
-
-      console.log("[main.js] doc     = " + JSON.stringify(doc));
+      console.log("[main.js] err = " + err);
+      console.log("[main.js] doc = " + JSON.stringify(doc));
       io.sockets.emit('S_to_C_VISITOR', doc);
     });
   });
@@ -194,65 +147,5 @@ io.sockets.on('connection', function(socket) {
 
 
 });
-
-
-/**
- * 数字が 1 桁の場合に 0 埋めで 2 桁にする
- * @param {number} num - 数値
- * @return {number} num - 0 埋めされた 2 桁の数値
- * @example
- * toDoubleDigits(8);
-*/
-let toDoubleDigits = function(num) {
-//  console.log("[main.js] toDoubleDigits()");
-//  console.log("[main.js] num = " + num);
-  num += '';
-  if(num.length === 1) {
-    num = '0' + num;
-  }
-  return num;
-};
-
-
-/**
- * 現在の日付を YYYY-MM-DD 形式で取得する
- * @param {void}
- * @return {string} day - 日付
- * @example
- * yyyymmdd();
-*/
-let yyyymmdd = function() {
-  console.log("[main.js] yyyymmdd()");
-  let date = new Date();
-
-  let yyyy = date.getFullYear();
-  let mm   = toDoubleDigits(date.getMonth() + 1);
-  let dd   = toDoubleDigits(date.getDate());
-
-  let day = yyyy + '-' + mm + '-' + dd;
-  console.log("[main.js] day = " + day);
-  return day;
-};
-
-
-/**
- * 現在の時刻を HH:MM:SS 形式で取得する
- * @param {void}
- * @return {string} time - 時刻
- * @example
- * hhmmss();
-*/
-let hhmmss = function() {
-  console.log("[main.js] hhmmss()");
-  let date = new Date();
-
-  let hour = toDoubleDigits(date.getHours());
-  let min  = toDoubleDigits(date.getMinutes());
-  let sec  = toDoubleDigits(date.getSeconds());
-
-  let time = hour + ':' + min + ':' + sec;
-  console.log("[main.js] time = " + time);
-  return time;
-};
 
 
